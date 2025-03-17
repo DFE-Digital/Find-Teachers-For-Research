@@ -1,0 +1,181 @@
+@page
+@using findteachersforresearch.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model findteachersforresearch.Pages.ManageResearchRound
+
+@functions {
+    private string body;
+}
+
+@{
+    ViewData["Title"] = "Research Round Candidates";
+    var researchRoundTypes = Enum.GetValues<ResearchRound.TypeOfResearchRound>();
+}
+<h2>Edit: @Model.ResearchRound.Name </h2>
+<form method="post">
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <button type="submit" id="saveResearchRoundEdit" class="btn btn-secondary">
+            Save Changes
+        </button>
+    </div>
+    <div><h5>@Model.ResearchRound.Description.ToString()</h5></div>
+
+    <td><H5>@Model.ResearchRound.CreatedDate.ToString("yyyy-MM-dd")</H5></td>
+    <div>Created By: <H5>@Model.ResearchRound.CreatedBy </H5></div>
+    <div class="mb-3">
+        <label for="researchType" class="form-label">Research Type:</label>
+        <select id="researchType" name="ResearchType" class="form-select">
+            @foreach (var type in researchRoundTypes)
+            {
+                if (type == Model.ResearchRound.Type)
+                {
+                    <option value="@type" selected>@type</option>
+                }
+                else
+                {
+                    <option value="@type">@type</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <button type="button" id="exportResearchRound" class="btn btn-secondary">
+            Export / Mail Merge
+        </button>
+    </div>
+    <table class="table table-striped" id="resultsTable">
+        <thead>
+
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>TRN</th>
+                <th>Email</th>
+                <th>Professional Status</th>
+                <th>Qualifications</th>
+                <th>Opt out of DfE research</th>
+                <th>Remove from round</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (Model.Persons != null && Model.Persons.Any())
+            {
+                int i = 0;
+                @foreach (var person in Model.Persons)
+                {
+                    <tr>
+
+                        <td class="align-middle checkbox-cell">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" class="form-check-input select-row person-checkbox" data-id="@person.Id" id="person-@person.Id" name="PersonSelections[@i].IsSelected" value="true" />
+                                <label for="person-@person.Id"></label>
+                            </div>
+
+
+                            <td>@($"{person.FirstName} {person.LastName}")</td>
+                            <td>@(DateTime.Now.Year - person.DateOfBirth.Year) years</td>
+                            <td>@person.Gender</td>
+                            <td>@person.ReferenceNumber</td>
+                            <td><a href="mailto:@person.EmailWork">@person.EmailWork</a></td>
+                            <td>@person.ProfStatuses.FirstOrDefault()?.StatusName</td>
+                            <td>@person.Qualifications.FirstOrDefault()?.Name</td>
+
+                            <td>
+                                <input type="checkbox" class="form-check-input select-row optout-checkbox" data-id="@person.OptedOutOfResearch" id="optout-@person.Id" name="PersonSelections[@i].OptedOut" value="true" />
+                                <label for="optout-@person.Id"></label>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="form-check-input select-row remove-checkbox" id="remove-@person.Id" name="PersonSelections[@i].Removed" value="true" />
+                                <label for="remove-@person.Id"></label>
+                            </td>
+                            <input type="hidden" name="PersonSelections[@i].Id" value="@person.Id" />
+                            <input type="hidden" name="ResearchRoundId" value="@Model.ResearchRound.Id" />
+                    </tr>
+                    i++;
+                }
+            }
+            else
+            {
+                <p>There are no participants in this research round.</p>
+            }
+        </tbody>
+    </table>
+</form>
+<style>
+    .checkbox-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        //**************************************************************************************************************
+        //Constants
+        //**************************************************************************************************************
+        
+        const checkboxes = document.querySelectorAll('.select-row');
+        const saveButton = document.getElementById('saveResearchRoundEdit');
+        const exportButton = document.getElementById('exportResearchRound');
+        const researchTypeSelect = document.getElementById('researchType');
+
+        //**************************************************************************************************************
+        //Functions and Listeners
+        //**************************************************************************************************************
+        function updateButtonState() {
+            let atLeastOneChecked = false;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    atLeastOneChecked = true;
+                    return;
+                }
+            });
+            saveButton.disabled = !atLeastOneChecked;
+        }
+        
+        researchTypeSelect.addEventListener('change', function() {
+            saveButton.disabled = false;
+        });
+        
+        exportButton.addEventListener('click', function() {
+            let subject = encodeURIComponent("Research Round: @Model.ResearchRound.Name");
+            let body = encodeURIComponent(generateEmailBody());
+            let mailtoLink = "mailto:?subject=" + subject + "&body=" + body;
+            window.location.href = mailtoLink;
+        });
+
+        function generateEmailBody() {
+            let body = "Research Round Details:\n";
+            body += "Name: @Model.ResearchRound.Name\n";
+            body += "Type: @Model.ResearchRound.Type\n";
+            body += "Created By: @Model.ResearchRound.CreatedBy\n";
+            body += "Created Date: @Model.ResearchRound.CreatedDate.ToString("yyyy-MM-dd")\n\n";
+
+            body += "Participants:\n";
+            @if (Model.Persons != null && Model.Persons.Any())
+            {
+                @foreach (var person in Model.Persons)
+                {
+                    body += "@person.FirstName @person.LastName, @person.EmailWork\n";
+                }
+            }
+            return body;
+        }
+        //**************************************************************************************************************
+        //Code
+        //**************************************************************************************************************
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+
+        updateButtonState();
+        
+    });
+</script>

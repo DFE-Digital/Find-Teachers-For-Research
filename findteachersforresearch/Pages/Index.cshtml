@@ -1,0 +1,305 @@
+﻿@page
+@model findteachersforresearch.Pages.IndexModel
+
+<h3>Find Teachers and Trainees For Research...</h3>
+
+<div class="mb-3">
+    <label for="recordCount" class="form-label">Set Research Round Size...</label>
+    <div class="d-flex align-items-center">
+        <input type="number" id="recordCount" name="recordCount" value="@Model.RecordCount" min="1" max="@Model.MaxRecordCount" class="form-control me-2 input-small" />
+        <button type="button" id="loadRecordsButton" class="btn btn-secondary">Refresh</button>
+    </div>
+</div>
+
+<form method="get" id="filterForm" class="mb-3">
+    <div class="row mb-2">
+        <label class="form-label">Set Research Attributes...</label>
+        <div class="col-md-6">
+
+            <div>
+                @foreach (var status in Model.AllProfStatuses)
+                {
+                    <button type="button" onclick="toggleFilter('ProfStatus', '@status')" class="btn btn-group-sm @(Model.FilterProfStatuses.Contains(status) ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">@status</button>
+                }
+            </div>
+        </div>
+        <div class="col-md-6">
+
+            <div>
+                @foreach (var qualification in Model.AllQualifications)
+                {
+                    <button type="button" onclick="toggleFilter('Qualification', '@qualification')" class="btn btn-group-sm @(Model.FilterQualifications.Contains(qualification) ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">@qualification</button>
+                }
+            </div>
+        </div>
+    </div>
+    @foreach (var status in Model.FilterProfStatuses)
+    {
+        <input type="hidden" name="FilterProfStatuses" value="@status" />
+    }
+    @foreach (var qualification in Model.FilterQualifications)
+    {
+        <input type="hidden" name="FilterQualifications" value="@qualification" />
+    }
+    <input type="hidden" id="recordCountHidden" name="recordCount" value="@Model.RecordCount" />
+    <button type="submit" class="btn btn-secondary">Apply Filters</button>
+</form>
+
+<div class="mb-3">
+    <form method="get" asp-action="Index" class="d-flex">
+        <input type="text" name="searchString" value="@Model.SearchString" placeholder="Search..." class="form-control me-2">
+        <input type="hidden" name="recordCount" value="@Model.RecordCount" />
+        <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+</div>
+<div class="d-flex justify-content-end align-items-center mb-3">
+    <button type="button" id="createResearchCampaignButton" class="btn btn-secondary" disabled>
+        Create Research Round
+    </button>
+</div>
+
+
+<div class="d-flex justify-content-end align-items-center mb-3">
+    <button type="button" id="addToResearchCampaignButton" class="btn btn-secondary" disabled>
+        Add To Existing Round
+    </button>
+</div>
+<div class="modal fade" id="addToRoundModal" tabindex="-1" aria-labelledby="addToRoundModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addToRoundModalLabel">Add to Existing Research Round</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="researchRoundSelect">Select Research Round:</label>
+                <select id="researchRoundSelect" class="form-select">
+                    @foreach (var round in Model.AvailableResearchRounds)
+                    {
+                        <option value="@round.Id">@round.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="/Index">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="researchRoundId" id="modalResearchRoundId"/>
+                    <div id="modalSelectedIds"></div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="confirmAddToRound">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<table class="table table-striped" id="resultsTable">
+    <thead>
+    <tr>
+        <th style="width: 50px;"><input type="checkbox" id="selectAllCheckbox" /></th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Sex</th>
+        <th>TRN</th>
+        <th>Email</th>
+        <th>Professional Status</th>
+        <th>Qualifications</th>
+        <th>Known Employments</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var person in Model.Persons)
+    {
+        <tr>
+            <td class="align-middle checkbox-cell">
+                <div class="checkbox-wrapper">
+                    @if (person.ResearchRounds.Count == 0)
+                    {
+                        <input type="checkbox" class="form-check-input select-row" data-id="@person.Id" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="form-check-input select-row" data-id="@person.Id" disabled />
+                    }
+                </div>
+            </td>
+                
+                <td>@($"{person.FirstName} {person.LastName}")</td>
+                <td>@(DateTime.Now.Year - person.DateOfBirth.Year) years</td>
+                <td>@person.Gender</td>
+                <td>@person.ReferenceNumber</td>
+                <td><a href="mailto:@person.EmailWork">@person.EmailWork</a></td>
+                <td>@person.ProfStatuses.FirstOrDefault()?.StatusName</td>
+                <td>@person.Qualifications.FirstOrDefault()?.Name</td>
+                @* <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">@string.Join(", ", person.Employments.Select(e => $"{e.EstablishmentName} - {e.EmploymentType} ({e.StartDate.ToShortDateString()} - {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())})"))</td> *@
+            <td class="employment-cell">
+                @string.Join(", ", person.Employments.Select(e => $"{e.EstablishmentName} - {e.EmploymentType} ({e.StartDate.ToShortDateString()} - {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())})"))
+            </td>
+            
+            </tr>
+    }
+    </tbody>
+</table>
+<style>
+    .checkbox-cell {
+        padding: 0;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .form-check-input {
+        margin: 0;
+        padding: 0;
+    }
+
+    #resultsTable {
+        table-layout: auto; /* Let cells adjust based on content */
+        width: 100%; /* Take full width */
+    }
+
+    .employment-cell {
+        white-space: normal; /* Allow wrapping */
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        console.log("JavaScript is working!");
+        
+        //**************************************************************************************************************
+        // Constants
+        //**************************************************************************************************************
+        const checkboxes = document.querySelectorAll('.select-row');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const createButton = document.getElementById('createResearchCampaignButton');
+        const loadRecordsButton = document.getElementById('loadRecordsButton');
+        const filterForm = document.getElementById('filterForm');
+        const addButton = document.getElementById('addToResearchCampaignButton');
+        const addToRoundModal = new bootstrap.Modal(document.getElementById('addToRoundModal'));
+        const confirmAddToRound = document.getElementById('confirmAddToRound');
+        const researchRoundSelect = document.getElementById('researchRoundSelect');
+        //**************************************************************************************************************
+        // Functions
+        //**************************************************************************************************************
+        function toggleFilter(filterType, value) {
+            var filterForm = document.getElementById('filterForm');
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = filterType === 'ProfStatus' ? 'FilterProfStatuses' : 'FilterQualifications';
+            hiddenInput.value = value;
+
+            var existingInput = Array.from(filterForm.elements).find(input => input.name === hiddenInput.name && input.value === hiddenInput.value);
+            if (existingInput) {
+                filterForm.removeChild(existingInput);
+            } else {
+                filterForm.appendChild(hiddenInput);
+            }
+
+            var button = event.target;
+            button.classList.toggle('btn-primary');
+            button.classList.toggle('btn-outline-secondary');
+        }
+
+        function toggleButtons() {
+            const createButton = document.getElementById('createResearchCampaignButton');
+            const checkboxes = document.querySelectorAll('.select-row:not(:disabled)');
+            const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            const addToButton = document.getElementById('addToResearchCampaignButton');
+
+            createButton.disabled = !anyChecked;
+            addToButton.disabled = !anyChecked;
+        }
+        
+        //**************************************************************************************************************
+        // Even Listeners
+        //**************************************************************************************************************
+        //Select all checkboxes will re-evalutae the enabled state of the buttons that action things...
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = selectAllCheckbox.checked;
+            const checkboxes = document.querySelectorAll('.select-row:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            toggleButtons();
+        });
+        //Create research round...
+        createButton.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.select-row:checked:not(:disabled)'))
+                .map(checkbox => checkbox.dataset.id);
+
+            if (selectedIds.length > 0) {
+                const idsParam = selectedIds.join(',');
+                window.location.href = `/SelectedRows?ids=${idsParam}`;
+            }
+        });
+        //Load records REFACTOR THIS
+        loadRecordsButton.addEventListener('click', function() {
+            const recordCount = document.getElementById('recordCount').value;
+            const currentUrl = new URL(window.location.href);
+
+            // Get current filters
+            const filterProfStatuses = Array.from(document.querySelectorAll('input[name="FilterProfStatuses"]'))
+                .map(input => input.value);
+            const filterQualifications = Array.from(document.querySelectorAll('input[name="FilterQualifications"]'))
+                .map(input => input.value);
+
+            // Set record count and filters
+            currentUrl.searchParams.set('recordCount', recordCount);
+            filterProfStatuses.forEach(status => currentUrl.searchParams.append('FilterProfStatuses', status));
+            filterQualifications.forEach(qualification => currentUrl.searchParams.append('FilterQualifications', qualification));
+
+            window.location.href = currentUrl.toString();
+        });
+        //Filter Form...
+        filterForm.addEventListener('submit', function() {
+            const recordCount = document.getElementById('recordCount').value;
+            document.getElementById('recordCountHidden').value = recordCount;
+        });
+        //Add to research round - show modal...
+        addButton.addEventListener('click', function() {
+            addToRoundModal.show();
+        });
+        
+        //Add to research round modal confirm (REFACTOR THIS)
+        confirmAddToRound.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.select-row:checked:not(:disabled)'))
+                .map(checkbox => checkbox.dataset.id);
+            const selectedRoundId = researchRoundSelect.value;
+
+            document.getElementById('modalResearchRoundId').value = selectedRoundId;
+
+            const selectedIdsContainer = document.getElementById('modalSelectedIds');
+            selectedIdsContainer.innerHTML = ''; // Clear previous inputs
+
+            selectedIds.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selectedIds[]';
+                input.value = id;
+                selectedIdsContainer.appendChild(input);
+            });
+        });
+       
+        
+        
+        //**************************************************************************************************************
+        // Code
+        //**************************************************************************************************************
+        
+        // Set initial state of filters
+        window.toggleFilter = toggleFilter;
+        
+        //Add a listener for each checkbox - is this needed?
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', toggleButtons);
+        });
+        
+    });
+</script>
