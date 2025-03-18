@@ -57,6 +57,7 @@ jobs:
         max-cache: true
         reuse-cache: true
         snyk-token: ${{ secrets.SNYK_TOKEN }}
+        dockerfile-path: findteachersforresearch/Dockerfile
 
   test:
     name: Run tests
