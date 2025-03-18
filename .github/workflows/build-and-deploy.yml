@@ -52,12 +52,12 @@ jobs:
       uses: DFE-Digital/github-actions/build-docker-image@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        context: .
+        context: findteachersforresearch
         docker-repository: ${{ env.DOCKER_REPOSITORY }}
         max-cache: true
         reuse-cache: true
         snyk-token: ${{ secrets.SNYK_TOKEN }}
-        dockerfile-path: findteachersforresearch/Dockerfile
+        dockerfile-path: ./Dockerfile
 
   test:
     name: Run tests
