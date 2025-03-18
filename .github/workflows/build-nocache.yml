@@ -10,7 +10,7 @@ on:
 jobs:
   build-no-cache:
     env:
-      DOCKER_REPOSITORY: https://github.com/DFE-Digital/Find-Teachers-For-Research
+      DOCKER_REPOSITORY: ghcr.io/dfe-digital/Find-Teachers-For-Research
     outputs:
       docker-image-tag: ${{ steps.build-image.outputs.tag }}
     runs-on: ubuntu-latest
