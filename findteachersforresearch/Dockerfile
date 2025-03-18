@@ -2,15 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine3.20 AS build
 
 # Set the working directory inside the container
-# WORKDIR /src
-WORKDIR /findteachersforresearch
+#WORKDIR /src
+COPY findteachersforresearch /src
+WORKDIR /src
 
 # Copy the project file and restore dependencies
-COPY ["findteachersforresearch.csproj", "./"]
+# COPY ["../findteachersforresearch/findteachersforresearch.csproj", "./"]
 RUN dotnet restore
 
 # Copy the rest of the source code and publish the application
-COPY . .
+# COPY . .
 RUN dotnet publish "findteachersforresearch.csproj" -c Release -o /app/publish
 
 # Stage 2: Create the runtime image
@@ -27,7 +28,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Install required dependencies for globalization support
-RUN apk add --no-cache tzdata icu-data-full icu-libs
+#RUN apk add --no-cache tzdata icu-data-full icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy the HTTPS certificate
