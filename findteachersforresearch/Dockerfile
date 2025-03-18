@@ -2,7 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine3.20 AS build
 
 # Set the working directory inside the container
-WORKDIR /src
+# WORKDIR /src
+WORKDIR /findteachersforresearch
 
 # Copy the project file and restore dependencies
 COPY ["findteachersforresearch.csproj", "./"]
