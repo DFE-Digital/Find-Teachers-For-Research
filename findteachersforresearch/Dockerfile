@@ -2,7 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine3.20 AS build
 
 # Set the working directory inside the container
-WORKDIR /src
+# WORKDIR /src
+WORKDIR /findteachersforresearch
 
 # Copy the project file and restore dependencies
 COPY ["findteachersforresearch.csproj", "./"]
@@ -16,7 +17,8 @@ RUN dotnet publish "findteachersforresearch.csproj" -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine3.20 AS runtime
 
 # Set environment variable for HTTPS
-ENV ASPNETCORE_URLS="https://+:7238"
+# ENV ASPNETCORE_URLS="https://+:7238"
+ENV ASPNETCORE_URLS="http://+:3000"
 
 # Set working directory
 WORKDIR /app
@@ -29,10 +31,11 @@ RUN apk add --no-cache tzdata icu-data-full icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy the HTTPS certificate
-COPY aspnetapp.pfx /app/aspnetapp.pfx
+# COPY aspnetapp.pfx /app/aspnetapp.pfx
 
 # Expose the HTTPS port
-EXPOSE 7238
+# EXPOSE 7238
+EXPOSE 3000
 
 # Set the entry point to run the application
 ENTRYPOINT ["dotnet", "findteachersforresearch.dll"]
