@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: find-teachers-for-research-maintenance
+spec:
+  selector:
+    app: find-teachers-for-research-maintenance
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
