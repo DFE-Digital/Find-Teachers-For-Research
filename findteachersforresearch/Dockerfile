@@ -28,7 +28,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Install required dependencies for globalization support
-#RUN apk add --no-cache tzdata icu-data-full icu-libs
+RUN apk add --no-cache tzdata icu
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy the HTTPS certificate
