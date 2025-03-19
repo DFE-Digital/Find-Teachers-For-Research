@@ -80,5 +80,5 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-
+app.MapGet("/healthcheck",ctx=>ctx.Response.WriteAsync("OK"));
 app.Run();
