@@ -22,7 +22,7 @@ builder.Services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, o
 {
     options.Authority = $"{options.Authority}/v2.0/"; // Microsoft Identity Platform v2.0
     options.TokenValidationParameters.ValidateIssuer = false; // For single-tenant apps
-    
+    //options.ResponseType = "code";
     options.TokenValidationParameters.NameClaimType = "name";
     options.TokenValidationParameters.RoleClaimType = "roles";
     options.Events = new OpenIdConnectEvents
