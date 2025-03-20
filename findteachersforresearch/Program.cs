@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using findteachersforresearch.Data;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, o
 {
     options.Authority = $"{options.Authority}/v2.0/"; // Microsoft Identity Platform v2.0
     options.TokenValidationParameters.ValidateIssuer = false; // For single-tenant apps
-    
+    //options.ResponseType = "code";
     options.TokenValidationParameters.NameClaimType = "name";
     options.TokenValidationParameters.RoleClaimType = "roles";
     options.Events = new OpenIdConnectEvents
@@ -57,6 +58,13 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,6 +81,11 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+if (app.Environment.IsProduction())
+{
+    app.UseForwardedHeaders();
+}
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -80,10 +93,13 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-
+app.MapGet("/healthcheck",ctx=>ctx.Response.WriteAsync("OK"));
+if(builder.Environment.IsProduction())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+    }
+}
 app.Run();
-
-
-
-
-

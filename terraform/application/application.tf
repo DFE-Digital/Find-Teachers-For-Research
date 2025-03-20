@@ -18,6 +18,7 @@ module "application_configuration" {
   }
   secret_variables = {
     DATABASE_URL = module.postgres.url
+    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
   }
 }
 
