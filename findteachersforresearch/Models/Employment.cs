@@ -10,31 +10,24 @@ public class Employment
     [Required]
     public int Id { get; set; }
     [Required]
-    public int PersonId { get; set; } // Foreign key to Person
-    [Required]
-    public string EstablishmentName { get; set; }
+    public string PersonId { get; set; } // Foreign key to Person
     
-    [Required]
-    public string EstablishmentTypeName { get; set; }
-    [Required]
-    public string EstablishmentTypeGroupName { get; set; }
-    [Required]
-    public string EstablishmentTown { get; set; }
-    [Required]
-    public string EstablishmentCounty { get; set; }
+    public string? EstablishmentName { get; set; }
+    public string? EstablishmentTypeGroupName { get; set; }
+    public string? EmployerPostcode { get; set; }
     [Required]
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     [Required]
     public DateTime LastSeenInTPSDate { get; set; }
+    public DateTime ExtractDate { get; set; }
     [Required]
     public string EmploymentType { get; set; }
-    [Required]
-    public string EstablishmentCode { get; set; }
-    [Required]
-    public string LaCode { get; set; }
-    [Required]
-    public string EstablishmentStatus { get; set; }
-    [Required]
-    public string EstablishmentSource { get; set; }
+    public string? WithdrawalConfirmed { get; set; }
+    public string? Urn { get; set; }
+    public string? EstablishmentStatus { get; set; }
+    public string? EstablishmentSource { get; set; }
+    public string? PhaseOfEducation { get; set; }
+    public int NumberOfPupils { get; set; }
+    public decimal FSMPercentage { get; set; }
     }

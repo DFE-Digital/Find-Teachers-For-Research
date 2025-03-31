@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace findteachersforresearch.Models;
 
@@ -10,15 +11,15 @@ public class ProfStatus
         Unqualified,
         Trainee
     }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public int Id { get; set; }
     [Required]
-    public int PersonId { get; set; } // Foreign key to Person
+    public string PersonId { get; set; } // Foreign key to Person
+    
+    public Person Person { get; set; } // Navigation property
     
     public ProfStatusName StatusName { get; set; } 
-    
-    public string? ITTCourse { get; set; } 
-    
-    public DateTime? ITTStartDate { get; set; } 
     
 }

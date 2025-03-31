@@ -37,8 +37,8 @@ public class ManageResearchRound : PageModel
         
         Persons = _context.Persons
             .Where(p => p.ResearchRounds.Any(rr => rr.Id == researchRoundId))
-            .Include(p => p.ProfStatuses)
-            .Include(p => p.Qualifications)
+            .Include(p => p.ProfStatus)
+            .Include(p => p.Qualification)
             .ToList();
     }
     
@@ -82,8 +82,8 @@ public class ManageResearchRound : PageModel
 
     Persons = _context.Persons
         .Where(p => p.ResearchRounds.Any(rr => rr.Id == researchRoundId))
-        .Include(p => p.ProfStatuses)
-        .Include(p => p.Qualifications)
+        .Include(p => p.ProfStatus)
+        .Include(p => p.Qualification)
         .Include(p => p.ResearchRounds)
         .ToList();
 
