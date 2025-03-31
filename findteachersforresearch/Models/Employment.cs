@@ -21,13 +21,21 @@ public class Employment
     [Required]
     public DateTime LastSeenInTPSDate { get; set; }
     public DateTime ExtractDate { get; set; }
-    [Required]
-    public string EmploymentType { get; set; }
+    
+    //public string EmploymentType { get; set; }
+    public enum EmploymentType
+    {
+        FullTime = 0,
+        PartTimeRegular = 1,
+        PartTimeIrregular = 2,
+        PartTime = 3
+    }
+    public EmploymentType EmploymentTypeName { get; set; } 
     public string? WithdrawalConfirmed { get; set; }
     public string? Urn { get; set; }
     public string? EstablishmentStatus { get; set; }
     public string? EstablishmentSource { get; set; }
     public string? PhaseOfEducation { get; set; }
-    public int NumberOfPupils { get; set; }
-    public decimal FSMPercentage { get; set; }
+    public int? NumberOfPupils { get; set; }
+    public decimal? FSMPercentage { get; set; }
     }
