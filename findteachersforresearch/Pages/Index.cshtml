@@ -165,7 +165,14 @@
 
             </td>
             <td class="employment-cell">
-                @string.Join(", ", person.Employments.Select(e => $"{e.EstablishmentName} - {e.EmploymentType} ({e.StartDate.ToShortDateString()} - {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())})"))
+                @string.Join(", ", person.Employments.Select(e =>
+                    $"{e.EstablishmentName} , " +
+                    $"{e.EmploymentTypeName} , ({e.StartDate.ToShortDateString()} , {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())}) " +
+                    $"{(e.PhaseOfEducation != null ? "" + e.PhaseOfEducation + "," : string.Empty)}"+
+                    $"{(e.NumberOfPupils != null ? " Pupils " + e.NumberOfPupils + "," : string.Empty)}" +
+                    $"{(e.FSMPercentage != null ? " FSM% " + e.FSMPercentage +"," : string.Empty)}" + 
+                    $"{(e.Urn != null ? " URN " + e.Urn + "," : string.Empty)}" +
+                    $"{(e.EmployerPostcode != null ? " Postcode " + e.EmployerPostcode: string.Empty)}"))
             </td>
             </tr>
     }

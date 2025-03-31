@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using findteachersforresearch.Data;
@@ -11,9 +12,11 @@ using findteachersforresearch.Data;
 namespace findteachersforresearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331135707_make-number-of-pupils-not-null")]
+    partial class makenumberofpupilsnotnull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,8 +51,9 @@ namespace findteachersforresearch.Migrations
                     b.Property<string>("EmployerPostcode")
                         .HasColumnType("text");
 
-                    b.Property<int>("EmploymentTypeName")
-                        .HasColumnType("integer");
+                    b.Property<string>("EmploymentType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");

@@ -72,23 +72,6 @@ public class IndexModel : PageModel
         QualificationNamesList = Enum.GetValues(typeof(QualificationNames)).Cast<QualificationNames>();
         ProfStatusNamesList = Enum.GetValues(typeof(ProfStatusNames)).Cast<ProfStatusNames>();
         
-        /*IQueryable<Person> query = _context.Persons
-            .Include(p => p.ProfStatus)
-            .Include(p => p.Qualification)
-            .Include(p => p.Employments)
-            .Include(p => p.ResearchRounds)
-            .Where(p => p.OptedOutOfResearch == false)
-            .Where(p => p.ResearchRounds.Count == 0);*/
-
-        /*IQueryable<Person> query = _context.Persons
-            .Include(p => p.ProfStatus)
-            .Include(p => p.Qualification)
-            .Include(p => p.Employments)
-            .Include(p => p.ResearchRounds)
-            .Where(p => p.OptedOutOfResearch == false)
-            .Where(p => p.ResearchRounds.Count == 0);*/
-           
-        
         IQueryable<Person> query = _context.Persons
             .Include(p => p.ProfStatus)
             .Include(p => p.Qualification)
@@ -96,8 +79,6 @@ public class IndexModel : PageModel
             .Include(p => p.ResearchRounds)
             .Where(p => p.OptedOutOfResearch == false)
             .Where(p => p.ResearchRounds.Count == 0);
-        
-        
         
         if (!string.IsNullOrEmpty(SearchString))
         {
