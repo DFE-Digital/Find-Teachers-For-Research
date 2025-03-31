@@ -50,7 +50,6 @@
                 <th>Select</th>
                 <th>Name</th>
                 <th>Age</th>
-                <th>Sex</th>
                 <th>TRN</th>
                 <th>Email</th>
                 <th>Professional Status</th>
@@ -77,12 +76,28 @@
 
                             <td>@($"{person.FirstName} {person.LastName}")</td>
                             <td>@(DateTime.Now.Year - person.DateOfBirth.Year) years</td>
-                            <td>@person.Gender</td>
                             <td>@person.ReferenceNumber</td>
                             <td><a href="mailto:@person.EmailWork">@person.EmailWork</a></td>
-                            <td>@person.ProfStatuses.FirstOrDefault()?.StatusName</td>
-                            <td>@person.Qualifications.FirstOrDefault()?.Name</td>
-
+                            <td>@person.ProfStatus?.StatusName</td>
+                            @* <td>@person.ProfStatuses.FirstOrDefault()?.StatusName</td> *@
+                            @*<td>
+                                @((person.Qualifications.FirstOrDefault()?.QTSDate != null
+                                    ? $"QTS awarded {person.Qualifications.FirstOrDefault()?.QTSDate.Value.ToString("d")}"
+                                    : "No QTS"))
+                                ,
+                                @((person.Qualifications.FirstOrDefault()?.EYTSDate != null
+                                    ? $"EYTS awarded {person.Qualifications.FirstOrDefault()?.EYTSDate.Value.ToString("d")}"
+                                    : "No EYTS"))
+                            </td>*@
+                        <td>
+                                @((person.Qualification?.QTSDate != null
+                                    ? $"QTS awarded {person.Qualification?.QTSDate.Value.ToString("d")}"
+                                    : "No QTS"))
+                                ,
+                                @((person.Qualification?.EYTSDate != null
+                                    ? $"EYTS awarded {person.Qualification?.EYTSDate.Value.ToString("d")}"
+                                    : "No EYTS"))
+                            </td>
                             <td>
                                 <input type="checkbox" class="form-check-input select-row optout-checkbox" data-id="@person.OptedOutOfResearch" id="optout-@person.Id" name="PersonSelections[@i].OptedOut" value="true" />
                                 <label for="optout-@person.Id"></label>

@@ -10,27 +10,40 @@
         <button type="button" id="loadRecordsButton" class="btn btn-secondary">Refresh</button>
     </div>
 </div>
-
+<!--
+**************************************************************************************************************
+// Filters
+**************************************************************************************************************
+-->
 <form method="get" id="filterForm" class="mb-3">
     <div class="row mb-2">
         <label class="form-label">Set Research Attributes...</label>
         <div class="col-md-6">
 
             <div>
-                @foreach (var status in Model.AllProfStatuses)
+                @foreach (var profStatus in Model.ProfStatusNamesList)
                 {
-                    <button type="button" onclick="toggleFilter('ProfStatus', '@status')" class="btn btn-group-sm @(Model.FilterProfStatuses.Contains(status) ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">@status</button>
+                    <button type="button"
+                            onclick="toggleFilter('ProfStatus', '@profStatus.ToString()')"
+                            class="btn btn-group-sm @(profStatus.ToString() == "btn-primary" ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">
+                        @profStatus
+                    </button>
                 }
             </div>
         </div>
         <div class="col-md-6">
 
             <div>
-                @foreach (var qualification in Model.AllQualifications)
+                @foreach (var qualification in Model.QualificationNamesList)
                 {
-                    <button type="button" onclick="toggleFilter('Qualification', '@qualification')" class="btn btn-group-sm @(Model.FilterQualifications.Contains(qualification) ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">@qualification</button>
+                    <button type="button"
+                            onclick="toggleFilter('Qualification', '@qualification.ToString()')"
+                            class="btn btn-group-sm @(qualification.ToString() == "btn-primary" ? "btn-primary" : "btn-outline-secondary") me-1 mb-1">
+                        @qualification
+                    </button>
                 }
             </div>
+            
         </div>
     </div>
     @foreach (var status in Model.FilterProfStatuses)
@@ -57,7 +70,6 @@
         Create Research Round
     </button>
 </div>
-
 
 <div class="d-flex justify-content-end align-items-center mb-3">
     <button type="button" id="addToResearchCampaignButton" class="btn btn-secondary" disabled>
@@ -93,14 +105,17 @@
     </div>
 </div>
 
-
+<!--
+**************************************************************************************************************
+// Table
+**************************************************************************************************************
+-->
 <table class="table table-striped" id="resultsTable">
     <thead>
     <tr>
         <th style="width: 50px;"><input type="checkbox" id="selectAllCheckbox" /></th>
         <th>Name</th>
         <th>Age</th>
-        <th>Sex</th>
         <th>TRN</th>
         <th>Email</th>
         <th>Professional Status</th>
@@ -124,19 +139,34 @@
                     }
                 </div>
             </td>
+            <script>
+                console.log("Person:" @person.LastName " " @person.ProfStatus );
+            </script>
                 
                 <td>@($"{person.FirstName} {person.LastName}")</td>
                 <td>@(DateTime.Now.Year - person.DateOfBirth.Year) years</td>
-                <td>@person.Gender</td>
                 <td>@person.ReferenceNumber</td>
                 <td><a href="mailto:@person.EmailWork">@person.EmailWork</a></td>
-                <td>@person.ProfStatuses.FirstOrDefault()?.StatusName</td>
-                <td>@person.Qualifications.FirstOrDefault()?.Name</td>
-                @* <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">@string.Join(", ", person.Employments.Select(e => $"{e.EstablishmentName} - {e.EmploymentType} ({e.StartDate.ToShortDateString()} - {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())})"))</td> *@
+                <td>@person.ProfStatus?.StatusName</td>
+            <td>
+                @((person.Qualification.QTSDate != null
+                    ? $"QTS awarded {person.Qualification?.QTSDate.Value.ToString("d")}"
+                    : string.Empty))
+                @((person.Qualification?.EYTSDate != null
+                    ? $"EYTS awarded {person.Qualification?.EYTSDate.Value.ToString("d")}"
+                    : string.Empty))
+                @(person.Qualification?.MQ > 0 ? "MQ" : string.Empty)
+                @(person.Qualification?.NPQH > 0 ? "NPQH" : string.Empty)
+                @(person.Qualification?.NPQEL > 0 ? "NPQEL" : string.Empty)
+                @(person.Qualification?.NPQML > 0 ? "NPQML" : string.Empty)
+                @(person.Qualification?.NPQSL > 0 ? "NPQSL" : string.Empty)
+                @(person.Qualification?.NPQLBC > 0 ? "NPQLBC" : string.Empty)
+                @(person.Qualification?.NPQLTD > 0 ? "NPQLTD" : string.Empty)
+
+            </td>
             <td class="employment-cell">
                 @string.Join(", ", person.Employments.Select(e => $"{e.EstablishmentName} - {e.EmploymentType} ({e.StartDate.ToShortDateString()} - {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())})"))
             </td>
-            
             </tr>
     }
     </tbody>
@@ -286,8 +316,6 @@
                 selectedIdsContainer.appendChild(input);
             });
         });
-       
-        
         
         //**************************************************************************************************************
         // Code

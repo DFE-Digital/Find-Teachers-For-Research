@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using findteachersforresearch.Data;
@@ -11,9 +12,11 @@ using findteachersforresearch.Data;
 namespace findteachersforresearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328121214_ConfigureOneToOneRelationshipWithProfStatus")]
+    partial class ConfigureOneToOneRelationshipWithProfStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +48,6 @@ namespace findteachersforresearch.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("EmployerPostcode")
-                        .HasColumnType("text");
-
                     b.Property<string>("EmploymentType")
                         .IsRequired()
                         .HasColumnType("text");
@@ -56,6 +56,9 @@ namespace findteachersforresearch.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EstablishmentName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EstablishmentPostcode")
                         .HasColumnType("text");
 
                     b.Property<string>("EstablishmentSource")
@@ -83,6 +86,9 @@ namespace findteachersforresearch.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("PersonId1")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PhaseOfEducation")
                         .HasColumnType("text");
 
@@ -97,7 +103,7 @@ namespace findteachersforresearch.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId");
+                    b.HasIndex("PersonId1");
 
                     b.ToTable("Employment");
                 });
@@ -161,6 +167,9 @@ namespace findteachersforresearch.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("PersonId1")
+                        .HasColumnType("integer");
+
                     b.Property<int>("StatusName")
                         .HasColumnType("integer");
 
@@ -168,6 +177,8 @@ namespace findteachersforresearch.Migrations
 
                     b.HasIndex("PersonId")
                         .IsUnique();
+
+                    b.HasIndex("PersonId1");
 
                     b.ToTable("ProfStatus");
                 });
@@ -268,10 +279,7 @@ namespace findteachersforresearch.Migrations
                 {
                     b.HasOne("findteachersforresearch.Models.Person", null)
                         .WithMany("Employments")
-                        .HasForeignKey("PersonId")
-                        .HasPrincipalKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PersonId1");
                 });
 
             modelBuilder.Entity("findteachersforresearch.Models.ProfStatus", b =>
@@ -282,6 +290,10 @@ namespace findteachersforresearch.Migrations
                         .HasPrincipalKey("findteachersforresearch.Models.Person", "PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("findteachersforresearch.Models.Person", null)
+                        .WithMany("ProfStatuses")
+                        .HasForeignKey("PersonId1");
 
                     b.Navigation("Person");
                 });
@@ -304,6 +316,8 @@ namespace findteachersforresearch.Migrations
 
                     b.Navigation("ProfStatus")
                         .IsRequired();
+
+                    b.Navigation("ProfStatuses");
 
                     b.Navigation("Qualification")
                         .IsRequired();
