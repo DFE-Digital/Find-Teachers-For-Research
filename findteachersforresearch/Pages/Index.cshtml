@@ -1,6 +1,134 @@
 ﻿@page
 @model findteachersforresearch.Pages.IndexModel
 
+<head><link rel="stylesheet" href="/css/site.css" /></head>
+
+<h3>Find teachers and create a research round</h3>
+
+<form method="get" id="refreshForm">
+    <div style="display: flex; align-items: center;">
+        <label for="recordCount" style="margin-right: 10px;">Number of Teachers:</label>
+        <input type="number" id="recordCount" name="recordCount" value=@Model.RecordCount style="width: 100px; margin-right: 10px;"/>
+        <label for="profStatus" style="margin-right: 10px;">Status:</label>
+        <select id="profStatus" name="SelectedProfStatus" class="form-control" style="width: 150px; margin-right: 10px;">
+            @foreach (var status in Enum.GetValues(typeof(findteachersforresearch.Models.ProfStatus.ProfStatusName)))
+            {
+                if (status.ToString() == Model.SelectedProfStatus.ToString())
+                {
+                    <option value="@status" selected="selected">@status</option>
+                }
+                else
+                {
+                    <option value="@status">@status</option>
+                }
+            }
+        </select>
+        <!-- NPQGroups Checkboxes -->
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="margin-right: 10px;">NPQ Groups:</label>
+            <label style="margin-right: 10px;">
+                <input type="checkbox" name="SelectedNPQGroup" value="Leadership" onchange="toggleNPQCheckbox(this)"/>
+                Leadership NPQ's
+            </label>
+            <label style="margin-right: 10px;">
+                <input type="checkbox" name="SelectedNPQGroup" value="Specialised" onchange="toggleNPQCheckbox(this)"/>
+                Specialised NPQ's
+            </label>
+        </div>
+        <input type="text" id="searchString" name="searchString" value="@Model.SearchString" style="width: 400px; margin-right: 10px;"  placeholder="Enter a name or TRN..." />
+        <button type="submit" class="btn btn-primary">Find Teachers</button>
+    </div>
+</form>
+<!-- Spinner-->
+<div id="spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="width: 40px; height: 40px; border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    <p style="color: white; font-size: 18px; margin-top: 10px;">Loading...</p>
+</div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>TRN</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Qualifications</th>
+        <th>Known Employments</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var person in Model.Persons)
+    {
+        <tr>
+            <td>@($"{person.FirstName} {person.LastName}")</td>
+            <td>@(DateTime.Now.Year - person.DateOfBirth.Year) years</td>
+            <td>@person.ReferenceNumber</td>
+            <td><a href="mailto:@person.EmailWork">@person.EmailWork</a></td>
+            <td>@person.ProfStatus?.StatusName</td>
+
+            <td>
+                @if (person.Qualification != null)
+                {
+                    @((person.Qualification.QTSDate != null
+                        ? $"QTS awarded {person.Qualification?.QTSDate.Value.ToString("d")}"
+                        : string.Empty))
+                    @((person.Qualification?.EYTSDate != null
+                        ? $"EYTS awarded {person.Qualification?.EYTSDate.Value.ToString("d")}"
+                        : string.Empty))
+                    @(person.Qualification?.MQ > 0 ? "MQ" : string.Empty)
+                    @(person.Qualification?.NPQH > 0 ? " NPQH" : string.Empty)
+                    @(person.Qualification?.NPQEL > 0 ? " NPQEL" : string.Empty)
+                    @(person.Qualification?.NPQML > 0 ? " NPQML" : string.Empty)
+                    @(person.Qualification?.NPQSL > 0 ? " NPQSL" : string.Empty)
+                    @(person.Qualification?.NPQLBC > 0 ? " NPQLBC" : string.Empty)
+                    @(person.Qualification?.NPQLTD > 0 ? " NPQLTD" : string.Empty)
+                }
+                else
+                {
+                    <span>No Known Qualifications</span>
+                }
+            </td>
+            <td class="employment-cell">
+                @if (person.Employments != null && person.Employments.Any())
+                {
+                    @string.Join(", ", person.Employments.Select(e =>
+                        $"{e.EstablishmentName} , " +
+                        $"{e.EmploymentTypeName} , ({e.StartDate.ToShortDateString()} , {(e.EndDate == null ? "Current" : e.EndDate.Value.ToShortDateString())}) " +
+                        $"{(e.PhaseOfEducation != null ? "" + e.PhaseOfEducation + "," : string.Empty)}" +
+                        $"{(e.NumberOfPupils != null ? " Pupils " + e.NumberOfPupils + "," : string.Empty)}" +
+                        $"{(e.FSMPercentage != null ? " FSM% " + e.FSMPercentage + "," : string.Empty)}" +
+                        $"{(e.Urn != null ? " URN " + e.Urn + "," : string.Empty)}" +
+                        $"{(e.EmployerPostcode != null ? " Postcode " + e.EmployerPostcode : string.Empty)}"))
+                }
+                else
+                {
+                    <span>No Employments</span>
+                }
+            </td>
+            
+        </tr>
+    }
+    </tbody>
+</table>
+<script>
+    function toggleNPQCheckbox(selectedCheckbox) {
+        const checkboxes = document.querySelectorAll('input[name="SelectedNPQGroup"]');
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox !== selectedCheckbox) {
+                checkbox.checked = false;
+            }
+        });
+    }
+
+
+    document.getElementById("refreshForm").addEventListener("submit", function() {
+        document.getElementById("spinner").style.display = "flex";
+    });
+
+</script>
+@*
 <h3>Find Teachers and Trainees For Research...</h3>
 
 <div class="mb-3">
@@ -337,4 +465,4 @@
         });
         
     });
-</script>
+</script>*@
