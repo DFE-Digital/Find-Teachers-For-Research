@@ -60,3 +60,36 @@ h1, h2, h3, h4, h5, h6 {
 .input-small {
   width: 100px; /* Adjust the width as needed */
 }
+/* spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#spinner {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+#spinner div {
+  width: 40px;
+  height: 40px;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+#spinner p {
+  color: white;
+  font-size: 18px;
+  margin-top: 10px;
+}

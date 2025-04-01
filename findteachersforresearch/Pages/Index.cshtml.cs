@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.Json;
 
 namespace findteachersforresearch.Pages;
 
@@ -28,7 +29,24 @@ public class IndexModel : PageModel
         
     public string UserName { get; private set; }
     public string UserEmail { get; private set; }
-        
+    
+    // Selected ProfStatusName
+    [BindProperty(SupportsGet = true)]
+    public ProfStatus.ProfStatusName SelectedProfStatus { get; set; } = Models.ProfStatus.ProfStatusName.Qualified;
+    
+    
+ 
+    
+    // Selected NPQ Group
+    [BindProperty(SupportsGet = true)]
+    public NPQGroups? SelectedNPQGroup { get; set; } = null;
+    
+    public enum NPQGroups
+    {
+        Leadership,
+        Specialised
+    }
+    
     public List<ResearchRound> AvailableResearchRounds {get; set;}
     
     public enum QualificationNames
@@ -63,26 +81,66 @@ public class IndexModel : PageModel
             // Retrieve the user's email
             UserEmail = User.FindFirstValue("preferred_username");
         }
-            
+        
         SearchString = searchString;
         FilterProfStatuses = filterProfStatuses ?? new List<string>();
         FilterQualifications = filterQualifications ?? new List<string>();
-        RecordCount = recordCount ?? 60;
+        RecordCount = recordCount ?? 30;
         
         QualificationNamesList = Enum.GetValues(typeof(QualificationNames)).Cast<QualificationNames>();
         ProfStatusNamesList = Enum.GetValues(typeof(ProfStatusNames)).Cast<ProfStatusNames>();
         
-        IQueryable<Person> query = _context.Persons
-            .Include(p => p.ProfStatus)
-            .Include(p => p.Qualification)
-            .Include(p => p.Employments)
-            .Include(p => p.ResearchRounds)
-            .Where(p => p.OptedOutOfResearch == false)
-            .Where(p => p.ResearchRounds.Count == 0);
+        var profStatus = SelectedProfStatus;
+        var npqGroup = SelectedNPQGroup;
+
+        IQueryable<Person> query = _context.Persons;
+        
+        if (npqGroup != null)
+        {   
+            if (npqGroup == NPQGroups.Leadership)
+            {
+                query = _context.Persons
+                    .Include(p => p.ProfStatus)
+                    .Include(p => p.Qualification)
+                    .Include(p => p.Employments)
+                    .Include(p => p.ResearchRounds)
+                    .Where(p => p.OptedOutOfResearch == false)
+                    .Where(p => p.ResearchRounds.Count == 0)
+                    .Where(p => p.ProfStatus.StatusName == profStatus)
+                    .Where(p => p.Qualification.NPQSL > 0 || p.Qualification.NPQH > 0 || p.Qualification.NPQEL > 0);;
+            }
+            if (npqGroup == NPQGroups.Specialised)
+            {
+                query = _context.Persons
+                    .Include(p => p.ProfStatus)
+                    .Include(p => p.Qualification)
+                    .Include(p => p.Employments)
+                    .Include(p => p.ResearchRounds)
+                    .Where(p => p.OptedOutOfResearch == false)
+                    .Where(p => p.ResearchRounds.Count == 0)
+                    .Where(p => p.ProfStatus.StatusName == profStatus)
+                    .Where(p => p.Qualification.NPQLTD > 0 || p.Qualification.NPQLBC > 0 || p.Qualification.NPQML > 0);;
+            }
+
+        }
+        else
+        {
+            query = _context.Persons
+                .Include(p => p.ProfStatus)
+                .Include(p => p.Qualification)
+                .Include(p => p.Employments)
+                .Include(p => p.ResearchRounds)
+                .Where(p => p.OptedOutOfResearch == false)
+                .Where(p => p.ResearchRounds.Count == 0)
+                .Where(p => p.ProfStatus.StatusName == profStatus);
+        }
         
         if (!string.IsNullOrEmpty(SearchString))
         {
-            query = query.Where(p => p.FirstName.Contains(SearchString) || p.LastName.Contains(SearchString));
+            //query = query.Where(p => p.FirstName.Contains(SearchString) || p.LastName.Contains(SearchString));
+            query = query.Where(p => EF.Functions.Like(p.FirstName, $"%{searchString}%") || 
+                                            EF.Functions.Like(p.LastName, $"%{searchString}%") ||
+                                            EF.Functions.Like(p.ReferenceNumber, $"%{searchString}%")) ;
         }
 
         if (FilterProfStatuses != null && FilterProfStatuses.Any())
@@ -153,5 +211,5 @@ public class IndexModel : PageModel
 
         return RedirectToPage("/Index");
     }
-        
+    
 }
