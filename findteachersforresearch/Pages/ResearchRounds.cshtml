@@ -42,7 +42,7 @@
                     <td>@round.Id</td>
                     <td>@round.Type</td>
                     <td>@round.Name</td>
-                    <td>@round.Description</td>
+                    <td>@(string.IsNullOrEmpty(round.Description) ? "" : round.Description)</td>
                     <td>@round.CreatedBy</td>
                     <td>@round.CreatedDate.ToString("yyyy-MM-dd")</td>
                 </tr>
