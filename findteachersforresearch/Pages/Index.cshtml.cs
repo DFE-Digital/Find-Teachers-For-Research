@@ -34,9 +34,6 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public ProfStatus.ProfStatusName SelectedProfStatus { get; set; } = Models.ProfStatus.ProfStatusName.Qualified;
     
-    
- 
-    
     // Selected NPQ Group
     [BindProperty(SupportsGet = true)]
     public NPQGroups? SelectedNPQGroup { get; set; } = null;
@@ -173,8 +170,8 @@ public class IndexModel : PageModel
             
         AvailableResearchRounds = _context.ResearchRounds.ToList();
     }
-        
-    public IActionResult OnPost([FromForm] int[] selectedIds, int researchRoundId)
+    
+    public IActionResult OnPost([FromForm] string selectedPersonIds, int researchRoundId)
     {
         if (!ModelState.IsValid)
         {
@@ -190,10 +187,11 @@ public class IndexModel : PageModel
             return BadRequest(ModelState); // Return a 400 with model state errors
         }
 
-        if (selectedIds != null && selectedIds.Any() && researchRoundId > 0)
+        if (!string.IsNullOrEmpty(selectedPersonIds) && researchRoundId > 0)
         {
+            var ids = selectedPersonIds.Split(',');
             var researchRound = _context.ResearchRounds.Include(r => r.Persons).FirstOrDefault(r => r.Id == researchRoundId);
-            var personsToAdd = _context.Persons.Where(p => selectedIds.Contains(p.Id)).ToList();
+            var personsToAdd = _context.Persons.Where(p => selectedPersonIds.Contains(p.PersonId)).ToList();
 
             if (researchRound != null && personsToAdd.Any())
             {
@@ -208,8 +206,6 @@ public class IndexModel : PageModel
                 _context.SaveChanges();
             }
         }
-
-        return RedirectToPage("/Index");
+        return RedirectToPage("/ResearchRounds");
     }
-    
 }

@@ -29,20 +29,19 @@ public class SelectedRows : PageModel
         
     [BindProperty]
     public string ResearchDescription { get; set; }
-    public async Task OnGetAsync(string ids)
+    public async Task OnGetAsync([FromQuery] string selectedIds)
     {
         Persons = _context.Persons.ToList();
-
-        if (!string.IsNullOrEmpty(ids))
+        
+        if (!string.IsNullOrEmpty(selectedIds))
         {
-            var selectedIds = ids.Split(',')
-                .Select(id => Convert.ToInt32(id))
-                .ToList();
 
-            Persons = Persons.Where(p => selectedIds.Contains(p.Id)).ToList();
+            var ids = selectedIds.Split(',');
+               
+            Persons = Persons.Where(p => ids.Contains(p.PersonId)).ToList();
 
             // Store the selected Person IDs in TempData
-            TempData["SelectedPersonIds"] = string.Join(",", selectedIds);
+            TempData["SelectedPersonIds"] = string.Join(",", ids);
         }
     }
 
@@ -50,9 +49,9 @@ public class SelectedRows : PageModel
     {
         // Retrieve selected person IDs from TempData
         var selectedIds = TempData["SelectedPersonIds"]?.ToString()
-            .Split(',')
-            .Select(id => Convert.ToInt32(id))
-            .ToList();
+            .Split(',');
+            //.Select(id => Convert.ToInt32(id))
+            //.ToList();
 
         if (selectedIds == null || !selectedIds.Any())
         {
@@ -61,7 +60,7 @@ public class SelectedRows : PageModel
         }
         
         Persons = await _context.Persons
-            .Where(p => selectedIds.Contains(p.Id))
+            .Where(p => selectedIds.Contains(p.PersonId))
             .Include(p => p.ResearchRounds)
             .ToListAsync();
 
@@ -104,8 +103,7 @@ public class SelectedRows : PageModel
 
             await _context.SaveChangesAsync();
         }
-
-        // Redirect to the ResearchRounds page
+        
         return RedirectToPage("/ResearchRounds");
     }
 }
