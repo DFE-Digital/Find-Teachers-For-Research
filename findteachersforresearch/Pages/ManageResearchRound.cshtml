@@ -11,17 +11,17 @@
     ViewData["Title"] = "Research Round Candidates";
     var researchRoundTypes = Enum.GetValues<ResearchRound.TypeOfResearchRound>();
 }
-<h2>Edit: @Model.ResearchRound.Name </h2>
+<head><link rel="stylesheet" href="/css/site.css" /></head>
+<div><h5>Edit research round...</h5></div>
+<div><h5>@Model.ResearchRound.Description.ToString()</h5></div>
 <form method="post">
     <div class="d-flex justify-content-end align-items-center mb-3">
-        <button type="submit" id="saveResearchRoundEdit" class="btn btn-secondary">
-            Save Changes
+        <button type="submit" id="saveResearchRoundEdit" class="btn btn-primary">
+            Save
         </button>
     </div>
-    <div><h5>@Model.ResearchRound.Description.ToString()</h5></div>
-
-    <td><H5>@Model.ResearchRound.CreatedDate.ToString("yyyy-MM-dd")</H5></td>
-    <div>Created By: <H5>@Model.ResearchRound.CreatedBy </H5></div>
+    <td>@Model.ResearchRound.CreatedDate.ToString("yyyy-MM-dd")</td>
+    <div>Created By: @Model.ResearchRound.CreatedBy</div>
     <div class="mb-3">
         <label for="researchType" class="form-label">Research Type:</label>
         <select id="researchType" name="ResearchType" class="form-select">
@@ -38,11 +38,13 @@
             }
         </select>
     </div>
+   
     <div class="d-flex justify-content-end align-items-center mb-3">
         <button type="button" id="exportResearchRound" class="btn btn-secondary">
-            Export / Mail Merge
+            Mail Merge
         </button>
     </div>
+   
     <table class="table table-striped" id="resultsTable">
         <thead>
 
@@ -128,6 +130,7 @@
         height: 100%;
     }
 </style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
@@ -143,6 +146,11 @@
         //**************************************************************************************************************
         //Functions and Listeners
         //**************************************************************************************************************
+
+      
+
+
+
         function updateButtonState() {
             let atLeastOneChecked = false;
             checkboxes.forEach(cb => {

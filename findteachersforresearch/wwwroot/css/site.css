@@ -1,3 +1,17 @@
+.container {
+  width: 100%; /* Use the full width of the viewport */
+  max-width: none; /* Remove any width constraints */
+  padding: 20px; /* Keep some padding for visual balance */
+}
+div {
+  max-width: none !important; /* Force removal of any constraints */
+}
+/* Add a custom full-width rule for the Index page */
+#indexPageContainer {
+  width: 100%; /* Take up the entire screen width */
+  max-width: none; /* Remove the default width restriction */
+  padding: 20px; /* Optional for some spacing */
+}
 
 /* Reset some default browser styles */
 * {
@@ -92,4 +106,47 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
   font-size: 18px;
   margin-top: 10px;
+}
+
+/* Viewport */
+ body, html {
+   margin: 0;
+   padding: 0;
+   height: 100%;
+ }
+
+/* Ensure the full layout takes up the entire viewport height */
+div[style*="height: 100vh"] {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Scrollable table container */
+div[style*="overflow-y: auto"] {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Footer styling */
+footer {
+  background-color: #f8f9fa;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Optional: Table styles for better UX */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
 }
