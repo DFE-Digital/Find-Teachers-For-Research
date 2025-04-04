@@ -7,7 +7,8 @@
     ViewData["Title"] = "Research Candidates";
     var researchRoundTypes = Enum.GetValues<ResearchRound.TypeOfResearchRound>();
 }
-<h2>Create Research Round</h2>
+<head><link rel="stylesheet" href="/css/site.css" /></head>
+<div><h5>New research round...</h5></div>
 <form method="post">
     <div class="mb-3">
         <input type="text" id="researchTitle" name="ResearchTitle" class="form-control" oninput="toggleButton()" placeholder="Enter research round name" />
