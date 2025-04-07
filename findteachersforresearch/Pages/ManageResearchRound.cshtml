@@ -24,7 +24,7 @@
     <div>Created By: @Model.ResearchRound.CreatedBy</div>
     <div class="mb-3">
         <label for="researchType" class="form-label">Research Type:</label>
-        <select id="researchType" name="ResearchType" class="form-select">
+        <select id="researchType" name="ResearchType" class="form-select" style="width: 200px;">
             @foreach (var type in researchRoundTypes)
             {
                 if (type == Model.ResearchRound.Type)
