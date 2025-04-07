@@ -35,7 +35,7 @@ ci:
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
 	$(eval SKIP_CONFIRM=true)
-	$(eval SKIP_PRODUCTION=true)
+	$(eval CONFIRM_PRODUCTION=true)
 
 set-azure-account:
 	[ "${SKIP_AZURE_LOGIN}" != "true" ] && az account set -s ${AZURE_SUBSCRIPTION} || true
