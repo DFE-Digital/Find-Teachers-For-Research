@@ -31,6 +31,9 @@ COPY --from=build /app/publish .
 RUN apk add --no-cache tzdata icu
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
+# Install Postgres client
+RUN apk --no-cache add postgresql16-client
+
 # Copy the HTTPS certificate
 # COPY aspnetapp.pfx /app/aspnetapp.pfx
 
