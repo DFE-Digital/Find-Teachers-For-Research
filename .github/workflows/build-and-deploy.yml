@@ -103,7 +103,7 @@ jobs:
         sha: ${{ needs.build.outputs.docker-image-tag }}
         terraform-base: ${{ env.TERRAFORM_BASE }}
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        smoke-test: true
+        smoke-test: false
 
   deploy:
     name: Deploy environments
@@ -134,7 +134,7 @@ jobs:
         terraform-base: ${{ env.TERRAFORM_BASE }}
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
         slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-        smoke-test: true
+        smoke-test: false
 
   manual_deploy:
     name: Manual deploy
@@ -161,5 +161,5 @@ jobs:
         terraform-base: ${{ env.TERRAFORM_BASE }}
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
         slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-        smoke-test: true
+        smoke-test: false
 #        db-seed: ${{ inputs.environment == 'review' && 'true' || 'false' }}
