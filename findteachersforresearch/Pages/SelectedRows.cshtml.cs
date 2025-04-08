@@ -55,7 +55,6 @@ public class SelectedRows : PageModel
 
         if (selectedIds == null || !selectedIds.Any())
         {
-            // Handle the case where no persons are selected (for safety)
             return Page();
         }
         
@@ -79,7 +78,7 @@ public class SelectedRows : PageModel
                 // Retrieve the user's email
                 UserEmail = User.FindFirstValue("preferred_username");
             }
-            // Create a new ResearchRound object
+            
             var newResearch = new ResearchRound
             {
                 Name = ResearchTitle,
