@@ -20,26 +20,21 @@ public class ManageResearchRound : PageModel
     
     [BindProperty]  // Crucial: Bind the property
     public int ResearchRoundId { get; set; }
-    public void OnGet(int researchRoundId)
+    public IActionResult OnGet(int researchRoundId)
     {
         ResearchRound = _context.ResearchRounds.FirstOrDefault(rr => rr.Id == researchRoundId);
 
-        if (ResearchRound == null) // Handle the case where the research round is not found
+        if (ResearchRound == null) 
         {
-            // Option 1: Redirect to an error page or display a message
-            // return RedirectToPage("/Error"); // Or a custom error page
-
-            // Option 2: Set Persons to an empty list to avoid further issues
             Persons = new List<Person>();
-            return; // Important: Exit OnGet to prevent trying to query Persons with a null ResearchRound
-
+            return NotFound(); 
         }
-        
         Persons = _context.Persons
-            .Where(p => p.ResearchRounds.Any(rr => rr.Id == researchRoundId))
+            .Where(p => p.ResearchRounds.Any(rr => rr.Id == researchRoundId) && !p.OptedOutOfResearch)
             .Include(p => p.ProfStatus)
             .Include(p => p.Qualification)
             .ToList();
+        return Page();
     }
     
     
@@ -66,18 +61,16 @@ public class ManageResearchRound : PageModel
                 Console.WriteLine($"Key: {modelStateKey}, Error: {error.ErrorMessage}");
             }
         }
-        return Page(); // Or BadRequest(ModelState);
+        return Page(); 
     }
 
-    int researchRoundId = ResearchRoundId; //stored in a hidden field in the page, it will get populated on submit as its bound.
+    int researchRoundId = ResearchRoundId; 
 
-    // Load the ResearchRound from the database
+   
     ResearchRound = _context.ResearchRounds.FirstOrDefault(rr => rr.Id == researchRoundId);
     if(ResearchRound == null){
         return NotFound();
     }
-
-    // Update ResearchRound.Type
     ResearchRound.Type = ResearchType;
 
     Persons = _context.Persons
@@ -95,14 +88,20 @@ public class ManageResearchRound : PageModel
             if (person != null)
             {
                 person.OptedOutOfResearch = selection.OptedOut;
-
+                
                 if (selection.Removed)
+                    //Remove from round
                 {
                     var researchRoundToRemoveFrom = person.ResearchRounds.FirstOrDefault(rr => rr.Id == researchRoundId);
                     if (researchRoundToRemoveFrom != null)
                     {
                         person.ResearchRounds.Remove(researchRoundToRemoveFrom);
                     }
+                }
+
+                if (person.OptedOutOfResearch)
+                {
+                    person.OptedOutOfResearch = selection.OptedOut;
                 }
             }
         }
@@ -115,7 +114,6 @@ public class ManageResearchRound : PageModel
     catch (Exception ex)
     {
         Console.WriteLine($"Database error: {ex.Message}");
-        // Handle the error appropriately
     }
 
     return RedirectToPage(new { researchRoundId = ResearchRoundId });

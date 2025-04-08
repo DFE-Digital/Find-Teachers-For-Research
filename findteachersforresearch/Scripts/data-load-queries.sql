@@ -27,7 +27,7 @@ WITH RankedRecords AS (
         trsp.last_name as LastName,
         trsp.date_of_birth as DateOfBirth,
         trsemp.person_email_address as EmailPersonal,
-        NULL as EmailWork,
+        NULL as EmailWork, --NEEDS TO CHANGE
         trsemp.national_insurance_number as Nino,
         ROW_NUMBER() OVER (
             PARTITION BY trsemp.person_id 
@@ -75,7 +75,7 @@ SELECT COUNT(1) FROM ana_persons; ----760,309 @ 27/03/2025
 SELECT
     trsemp.person_id as PersonId, e.establishment_name as EstablishmentName, e.establishment_type_group_name as EstablishmentTypeGroupName,
     trsemp.employer_postcode as EmployerPostcode,trsemp.start_date as StartDate,trsemp.end_date as EndDate,trsemp.last_known_tps_employed_date as LastSeenInTPSDate,
-    trsemp.last_extract_date as ExtractDate, trsemp.employment_type as EmploymentType,trsemp.withdrawal_confirmed as WithdrawalConfirmed,e.urn as Urn,
+    trsemp.last_extract_date as ExtractDate, trsemp.employment_type as EmploymentTypeName,trsemp.withdrawal_confirmed as WithdrawalConfirmed,e.urn as Urn,
     e.establishment_status_name as EstablishmentStatus, e.establishment_source_id as EstablishmentSource,e.phase_of_education_name as PhaseOfEducation,
     e.number_of_pupils as NumberOfPupils,e.free_school_meals_percentage as FSMPercentage
 INTO ana_employment
@@ -190,8 +190,22 @@ FROM ana_persons p
 
 
 --********************************************************************************************************************
---PostgreSQL Load commands
+--Generate SQL above then copy to pod
 --********************************************************************************************************************
+--kubectl get pods -n tra-development
+--kubectl cp /[insert location]/ftr-pp-persons.csv [insert pod]:/ -n tra-development
+--kubectl cp /[insert location]/ftr-pp-employment.csv [insert pod]:/ -n tra-development
+--kubectl cp /[insert location]/ftr-pp-prof-status.csv [insert pod]:/ -n tra-development
+--kubectl cp /[insert location]/ftr-pp-qualifications.csv [insert pod]:/ -n tra-development
+--kubectl exec -it [insert pod] -n tra-development -- /bin/ash
+
+--/app # env | grep DefaultConnection
+
+--export PGHOST=[insert host name]
+--export PGDATABASE=[insert db name]
+--export PGUSER=[insert username]
+--export PGPASSWORD=[insert secret]
+--env | grep PG
 --Person
 --command " "\\copy public.\"Persons\" (\"FirstName\", \"LastName\", \"Nino\", \"DateOfBirth\", \"ReferenceNumber\", \"EmailWork\", \"EmailPersonal\", \"OptedOutOfResearch\", \"PersonId\") FROM '/Users/aje/dev/python-projects/research/ftr-pp-persons.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''';""
 --ProfStatus
@@ -200,3 +214,11 @@ FROM ana_persons p
 --command " "\\copy public.\"Qualification\" (\"PersonId\", \"NPQSL\", \"EYTSDate\", \"MQ\", \"NPQEL\", \"NPQH\", \"NPQLBC\", \"NPQLTD\", \"NPQML\", \"QTSDate\") FROM '/Users/aje/dev/python-projects/research/ftr-pp-qualifications.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''';""
 --Employment
 --command " "\\copy public.\"Employment\" (\"PersonId\", \"EstablishmentName\", \"EstablishmentTypeGroupName\", \"StartDate\", \"EndDate\", \"LastSeenInTPSDate\", \"EmploymentType\", \"EstablishmentStatus\", \"EstablishmentSource\", \"EmployerPostcode\", \"ExtractDate\", \"FSMPercentage\", \"NumberOfPupils\", \"PhaseOfEducation\", \"Urn\", \"WithdrawalConfirmed\") FROM '/Users/aje/dev/python-projects/research/ftr-pp-employment.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''';""
+
+
+--psql --command "\copy public.\"Persons\" (\"FirstName\", \"LastName\", \"Nino\", \"DateOfBirth\", \"ReferenceNumber\", \"EmailWork\", \"EmailPersonal\", \"OptedOutOfResearch\", \"PersonId\") FROM '/ftr-pp-persons.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''’;"
+--psql --command "\copy public.\"ProfStatus\" (\"PersonId\", \"StatusName\") FROM '/ftr-pp-prof-status.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''';"
+--psql --command "\copy public.\"Qualification\" (\"PersonId\", \"NPQSL\", \"EYTSDate\", \"MQ\", \"NPQEL\", \"NPQH\", \"NPQLBC\", \"NPQLTD\", \"NPQML\", \"QTSDate\") FROM '/ftr-pp-qualifications.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''’;”
+--psql --command "\copy public.\"Employment\" (\"PersonId\", \"EstablishmentName\", \"EstablishmentTypeGroupName\", \"StartDate\", \"EndDate\", \"LastSeenInTPSDate\", \"EmploymentTypeName\", \"EstablishmentStatus\", \"EstablishmentSource\", \"EmployerPostcode\", \"ExtractDate\", \"FSMPercentage\", \"NumberOfPupils\", \"PhaseOfEducation\", \"Urn\", \"WithdrawalConfirmed\") FROM '/ftr-pp-employment.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '\"' NULL 'NULL' ESCAPE '''';"
+
+
