@@ -78,6 +78,15 @@ variable "postgres_flexible_server_sku" {
   type    = string
   default = "B_Standard_B2ms"
 }
+variable "webapp_memory_max" {
+  type    = string
+  default = "2Gi"
+}
+
+variable "webapp_replicas" {
+  type    = number
+  default = 1
+}
 
 locals {
   postgres_ssl_mode = var.enable_postgres_ssl ? "require" : "disable"
