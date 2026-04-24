@@ -43,12 +43,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: azure/login@v2
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-
     - name: Set environment variables
       run: |
         source global_config/${DEPLOY_ENV}.sh
@@ -80,4 +74,3 @@ jobs:
         azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         backup-file: ${{ env.BACKUP_FILE }}.sql
         db-server-name: ${{ inputs.db-server }}
-        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
