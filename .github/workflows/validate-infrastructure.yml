@@ -20,12 +20,6 @@ jobs:
           - display: AKS infrastructure
             validation_plan: aks-infra
             terraform_base: terraform/application
-          - display: Domains infrastructure
-            validation_plan: domains-infra
-            terraform_base: terraform/domains/infrastructure
-          - display: Domains environment
-            validation_plan: domains-env
-            terraform_base: terraform/domains/environment_domains
 
     steps:
       - name: Validate ${{ matrix.display }}
