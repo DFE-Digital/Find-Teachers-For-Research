@@ -10,6 +10,9 @@ on:
         type: boolean
   schedule:
     - cron: "0 08 * * 0"
+  push:
+    branches:
+      - 2855-test
 
 permissions:
   id-token: write
@@ -20,7 +23,6 @@ env:
   GLOBAL_CONFIG_PATH: global_config
   TF_VARS_PATH: terraform/application/config
   TERRAFORM_BASE: terraform/application
-  TF_FILE: terraform.tf
   SERVICE_NAME: find-teachers-for-research
   RESOURCE_GROUP_NAME: s189t01-ftr-rv-rg
   STORAGE_ACCOUNT_NAME: s189t01ftrrvtfsa
@@ -52,7 +54,6 @@ jobs:
           resource-group-name: ${{ env.RESOURCE_GROUP_NAME }}
           storage-account-name: ${{ env.STORAGE_ACCOUNT_NAME }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
-          tf-file: ${{ env.TF_FILE }}
           service-name: ${{ env.SERVICE_NAME }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-repo: ${{ github.repository }}
