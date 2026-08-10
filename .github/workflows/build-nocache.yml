@@ -29,3 +29,4 @@ jobs:
         max-cache: true
         reuse-cache: false
         snyk-token: ${{ secrets.SNYK_TOKEN }}
+        dockerfile-path: findteachersforresearch/Dockerfile
